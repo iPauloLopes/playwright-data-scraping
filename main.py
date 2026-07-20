@@ -8,7 +8,7 @@ def run(playwright: Playwright) -> None:
     context = browser.new_context()
     page = context.new_page()
 
-    page.goto(f"https://iba-world.com/cocktails/all-cocktails/page/1/")
+    page.goto("https://iba-world.com/cocktails/all-cocktails/page/1/")
     page.get_by_role("button", name="Yes").click() #bypass age verification
     
     while True:
@@ -22,7 +22,10 @@ def run(playwright: Playwright) -> None:
             p = context.new_page()
             p.goto(links)
 
-#            time.sleep(1)
+            name = p.locator(".hfe-page-title > h1").inner_text()
+            recipe = p.locator(".elementor-shortcode > ul").inner_text()
+
+            print(name, recipe)
 
             p.close()
 
