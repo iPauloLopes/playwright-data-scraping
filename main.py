@@ -1,6 +1,7 @@
-import re
-from playwright.sync_api import Playwright, sync_playwright, expect
+from playwright.sync_api import Playwright, sync_playwright
 import time #only here for debbuging should not be on final code
+import json
+import csv
 
 
 def run(playwright: Playwright) -> None:
@@ -25,8 +26,15 @@ def run(playwright: Playwright) -> None:
             name = p.locator(".hfe-page-title > h1").inner_text()
             recipe = p.locator(".elementor-shortcode > ul").first.inner_text()
 
-            print(name)
-            print(recipe)
+            results = []
+            results.append({
+                "name":name,
+                "recipe":recipe.splitlines()
+            })
+
+            # extract data as json file
+            with open("recipes.json", "a", encoding="utf-8") as f:
+                json.dump(results, f, ensure_ascii=False, indent=2)
 
             p.close()
 
