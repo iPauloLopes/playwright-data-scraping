@@ -1,7 +1,5 @@
 from playwright.sync_api import Playwright, sync_playwright
-import time #only here for debbuging should not be on final code
 import json
-import csv
 
 
 def run(playwright: Playwright) -> None:
@@ -11,9 +9,12 @@ def run(playwright: Playwright) -> None:
 
     page.goto("https://iba-world.com/cocktails/all-cocktails/page/1/")
     #page.get_by_role("button", name="Yes").click() #bypass age verification (only needed if headless=False)
+
+    results = []
     
     while True:
 
+        print("Loading...")
         cocktailPage = page.locator("div.iba-cocktails-container > div")
         cocktailList = cocktailPage.get_by_role("link").all()
 
@@ -26,15 +27,10 @@ def run(playwright: Playwright) -> None:
             name = p.locator(".hfe-page-title > h1").inner_text()
             recipe = p.locator(".elementor-shortcode > ul").first.inner_text()
 
-            results = []
             results.append({
                 "name":name,
                 "recipe":recipe.splitlines()
             })
-
-            # extract data as json file
-            with open("recipes.json", "a", encoding="utf-8") as f:
-                json.dump(results, f, ensure_ascii=False, indent=2)
 
             p.close()
 
@@ -47,6 +43,11 @@ def run(playwright: Playwright) -> None:
             break
 
         page.wait_for_load_state()
+
+    # extract data as json file
+    with open("recipes.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+        print("data extraction complete")
 
 
 with sync_playwright() as playwright:
